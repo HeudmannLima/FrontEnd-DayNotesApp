@@ -1,7 +1,7 @@
 import React from 'react';
 
 import './styles.css';
-import { AiFillCloseCircle, AiFillExclamationCircle } from 'react-icons/ai';
+import { AiTwotoneDelete, AiOutlineExclamation, AiTwotoneEdit } from 'react-icons/ai';
 
 function Notes({ data, handleChangePriority, handleDelete }) {
 
@@ -11,7 +11,7 @@ function Notes({ data, handleChangePriority, handleDelete }) {
       <div>
         <strong>{data.title}</strong>
         <div>
-          <AiFillCloseCircle
+          <AiTwotoneDelete
             onClick={() => handleDelete(data._id)}
             size="20"
             cursor="pointer"
@@ -21,9 +21,14 @@ function Notes({ data, handleChangePriority, handleDelete }) {
 
       <textarea disabled value={data.notes} />
       <p>
-        <AiFillExclamationCircle
+        <AiOutlineExclamation
           onClick={() => handleChangePriority(data._id)}
           size="20"
+          cursor= "pointer"
+        />
+        <AiTwotoneEdit 
+          className="buttonEdit"
+          cursor= "pointer"
         />
       </p>
 
