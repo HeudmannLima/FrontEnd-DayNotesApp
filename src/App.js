@@ -6,40 +6,51 @@ import './App.css';
 import './Sidebar.css';
 import './Main.css';
 
-import Annotations from './components/Annotations'
+import Notes from './components/Notes'
 
 function App() {
-  const [ annotations, setAnnotations ] = useState([]);
+  const [ allNotes, setAllNotes ] = useState([]);
 
-  const [ annotation_title, setAnnotationTitle ] = useState('');
-  const [ annotation, setAnnotation ] = useState('');
+  const [ title, setTitle ] = useState('');
+  const [ notes, setNotes ] = useState('');
 
+  async function loadAllNotes() {
+    const response = await api.get('/annotations');
+    setAllNotes(response.data)
+  }
   useEffect(() => {
-    async function loadAnnotations() {
-      const response = await api.get('/');
-
-      setAnnotations(response.data)
-    }
-
-    loadAnnotations();
+    loadAllNotes();
   }, [])
 
-  function handleSelectPriority() {
-    document.querySelector('li').classList.toggle('notepad-infos-priority')
-  } 
+  async function handleDelete(id) {
+    const deleteNote = await api.delete(`/annotations/${id}`)
+
+    if(deleteNote) {
+      loadAllNotes();
+    }
+  }
+
+  async function handleChangePriority(id) {
+    const changePriority = await api.post(`/priorities/${id}`)
+
+    if(changePriority) {
+     document.querySelector('li').classList.toggle('notepad-infos-priority')
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const response = await api.post('/', {
-      annotation_title,
-      annotation
+    const response = await api.post('/annotations', {
+      title,
+      notes,
+      priority: false,
     })
 
-    setAnnotationTitle('');
-    setAnnotation('');
+    setTitle('');
+    setNotes('');
 
-    setAnnotations([...annotations, response.data]);
+    setAllNotes([...allNotes, response.data]);
   }
 
   return (
@@ -48,22 +59,19 @@ function App() {
         <strong>Caderno de Notas</strong>
         <form onSubmit={handleSubmit} >
           <div className="input-block">
-            <label htmlFor="annotation_title">Titulo da Anotação</label>
+            <label htmlFor="title">Titulo da Anotação</label>
             <input
-              name="annotation_title"
-              id="annotation_title"
-              value={annotation_title}
-              onChange={e => setAnnotationTitle(e.target.value)}
+              value={title}
+              onChange={e => setTitle(e.target.value)}
               required />
           </div>
 
           <div className="input-block">
-            <label htmlFor="annotation">Anotação</label>
+            <label htmlFor="note">Anotação</label>
             <textarea
-              name="annotation"
-              id="annotation"
-              value={annotation}
-              onChange={e => setAnnotation(e.target.value)}
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              required
             ></textarea>
           </div>
 
@@ -72,28 +80,9 @@ function App() {
       </aside>
       <main>
         <ul>
-          {annotations.map(annotation => (
-           <Annotations key={annotation.id} annotation={annotation} />
+          {allNotes.map(data => (
+           <Notes key={data._id} data={data} handleChangePriority={handleChangePriority} handleDelete={handleDelete}/>
           ))}
-          
-
-          <li className= "notepad-infos" >
-            <div>
-              <strong>Fazer Compras</strong>
-              <div>
-               <AiFillCloseCircle size="20" cursor="pointer" />
-              </div> 
-            </div>
-            <textarea disabled defaultValue="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." name="anotattion" id="anotattion" cols="num" rows="num"></textarea>
-            <p>
-              <AiFillExclamationCircle
-                  onClick={handleSelectPriority}
-                  size="20"
-              />
-            </p>
-          </li>
-
-          
         </ul>
       </main>
     </div>
