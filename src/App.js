@@ -10,31 +10,28 @@ import Notes from './components/Notes'
 
 function App() {
   const [ allNotes, setAllNotes ] = useState([]);
-
   const [ title, setTitle ] = useState('');
   const [ notes, setNotes ] = useState('');
+  const [ prioritize, setPrioritize ] = useState('');
+
+  useEffect(() => {
+    loadAllNotes();
+  }, [prioritize])
 
   async function loadAllNotes() {
     const response = await api.get('/annotations');
     setAllNotes(response.data)
   }
-  useEffect(() => {
-    loadAllNotes();
-  }, [])
+
+  async function handleChangePriority(id) {
+    const changePriority = await api.post(`/priorities/${id}`);
+    setPrioritize(changePriority);
+  }
 
   async function handleDelete(id) {
     const deleteNote = await api.delete(`/annotations/${id}`)
-
     if(deleteNote) {
       loadAllNotes();
-    }
-  }
-
-  async function handleChangePriority(id) {
-    const changePriority = await api.post(`/priorities/${id}`)
-
-    if(changePriority) {
-     document.querySelector('li').classList.toggle('notepad-infos-priority')
     }
   }
 
@@ -49,12 +46,12 @@ function App() {
 
     setTitle('');
     setNotes('');
-
     setAllNotes([...allNotes, response.data]);
   }
 
   return (
     <div id="app">
+
       <aside>
         <strong>Caderno de Notas</strong>
         <form onSubmit={handleSubmit} >
@@ -63,7 +60,8 @@ function App() {
             <input
               value={title}
               onChange={e => setTitle(e.target.value)}
-              required />
+              required
+            />
           </div>
 
           <div className="input-block">
@@ -72,21 +70,29 @@ function App() {
               value={notes}
               onChange={e => setNotes(e.target.value)}
               required
-            ></textarea>
+            />
           </div>
 
           <button type="submit" >Salvar</button>  
         </form>
       </aside>
+
       <main>
         <ul>
           {allNotes.map(data => (
-           <Notes key={data._id} data={data} handleChangePriority={handleChangePriority} handleDelete={handleDelete}/>
+            <Notes
+              key={data._id}
+              data={data}
+              handleChangePriority={handleChangePriority}
+              handleDelete={handleDelete}
+            />
           ))}
         </ul>
       </main>
+
     </div>
   );
 }
 
 export default App;
+
