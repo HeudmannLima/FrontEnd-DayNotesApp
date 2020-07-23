@@ -60,6 +60,7 @@ li.notepad-infos-priority div div:hover {
 }
 
 .notepad-infos textarea {
+  padding: 7px;
   margin-top: 7px;
   margin-bottom: 5px;
   width: 100%;  
@@ -71,7 +72,12 @@ li.notepad-infos-priority div div:hover {
   resize:none;
 }
 
+.notepad-infos textarea:hover {
+  cursor: default;
+}
+
 .notepad-infos-priority textarea {
+  padding: 7px;
   margin-top: 7px;
   margin-bottom: 5px;
   width: 100%;  
